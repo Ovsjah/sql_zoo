@@ -641,11 +641,12 @@ SELECT stopb.name, a.company, a.num FROM route a JOIN route b
 10.
 ```
 SELECT first.num, first.company, first.name, second.num, second.company FROM
-  (SELECT stops.name, a.num, a.company FROM route a JOIN route b
-   ON a.company = b.company AND a.num = b.num JOIN stops ON a.stop = stops.id
-   WHERE b.stop = (SELECT stops.id FROM stops WHERE name = 'Craiglockhart')) AS first
+  (SELECT DISTINCT stopa.name, a.num, a.company FROM route a JOIN route b
+     ON a.company = b.company AND a.num = b.num JOIN stops stopa ON a.stop = stopa.id JOIN stops stopb ON b.stop = stopb.id
+     WHERE stopb.name = 'Craiglockhart') AS first
   JOIN 
-  (SELECT stops.name, a.num, a.company FROM route a JOIN route b
-   ON a.company = b.company AND a.num = b.num JOIN stops ON a.stop = stops.id    WHERE b.stop = (SELECT stops.id FROM stops WHERE name = 'Lochend')) AS second
-   ON first.name = second.name
+  (SELECT DISTINCT stopa.name, a.num, a.company FROM route a JOIN route b
+     ON a.company = b.company AND a.num = b.num JOIN stops stopa ON a.stop = stopa.id JOIN stops stopb ON b.stop = stopb.id
+     WHERE stopb.name = 'Lochend') AS second
+  ON first.name = second.name GROUP BY first.num, first.company, first.name, second.num, second.company
 ```
